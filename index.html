@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>nQAM Adaptativo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  </head>
+  <body class="bg-gray-100 min-h-screen flex flex-col">
+    <header class="bg-blue-600 text-white p-2 w-full">
+      <div class="max-w-4xl mx-auto">
+        <a href="/"
+          ><h1
+            class="text-2xl font-bold text-center hover:bg-blue-400 p-2 rounded"
+          >
+            nQAM Adaptativo
+          </h1></a
+        >
+      </div>
+    </header>
+
+    <main class="flex-grow flex items-center justify-center p-4">
+      <div
+        class="w-full max-w-4xl bg-white shadow-md rounded-lg overflow-hidden"
+      >
+        <div class="p-4">
+          <div class="mb-4">
+            <label for="qam-select" class="block mb-2 font-bold"
+              >Selecciona la modulación QAM:</label
+            >
+            <select
+              id="qam-select"
+              class="w-full p-2 border border-gray-300 rounded"
+            >
+              <option value="4">4-QAM</option>
+              <option value="8">8-QAM</option>
+              <option value="16">16-QAM</option>
+              <option value="32">32-QAM</option>
+              <option value="64">64-QAM</option>
+              <option value="256">256-QAM</option>
+            </select>
+          </div>
+
+          <div class="bg-white p-4 rounded shadow">
+            <canvas id="qamChart"></canvas>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <footer class="bg-gray-200 p-4 w-full">
+      <div class="max-w-4xl mx-auto text-center">
+        <p>UTN FRT - Comunicaciones - 3K4</p>
+        <p>Montilla Tomas - Legajo 53331</p>
+        <a
+          href="https://github.com/MontillaTomas/adaptive-nqam-modulation"
+          target="_blank"
+          class="text-blue-600 hover:underline"
+          >Repositorio en GitHub</a
+        >
+      </div>
+    </footer>
+
+    <script>
+      const ctx = document.getElementById("qamChart").getContext("2d");
+      const qamSelect = document.getElementById("qam-select");
+
+      function generateQAMPoints(qamValue) {
+        const points = [];
+        if (qamValue === 8) {
+          // Generar puntos para 8-QAM (octágono)
+          const r = 0.75; // Radio del octágono
+          for (let i = 0; i < 8; i++) {
+            const angle = (i * Math.PI) / 4;
+            points.push({
+              x: r * Math.cos(angle),
+              y: r * Math.sin(angle),
+            });
+          }
+        } else if (qamValue === 32) {
+          // Generar puntos para 32-QAM (6x6 grid sin las esquinas)
+          const side = Math.sqrt(qamValue + 4);
+          const step = 2 / side;
+          for (let i = 0; i < side; i++) {
+            for (let j = 0; j < side; j++) {
+              if (
+                !(i == 0 && j == 0) &&
+                !(i == 5 && j == 0) &&
+                !(i == 0 && j == 5) &&
+                !(i == 5 && j == 5)
+              ) {
+                points.push({
+                  x: -1 + step / 2 + i * step,
+                  y: -1 + step / 2 + j * step,
+                });
+              }
+            }
+          }
+        } else {
+          // Generar puntos para 4, 16, 64 y 256-QAM
+          const side = Math.sqrt(qamValue);
+          const step = 2 / side;
+          for (let i = 0; i < side; i++) {
+            for (let j = 0; j < side; j++) {
+              points.push({
+                x: -1 + step / 2 + i * step,
+                y: -1 + step / 2 + j * step,
+              });
+            }
+          }
+        }
+        return points;
+      }
+
+      let chart;
+
+      function updateChart(qamValue) {
+        const points = generateQAMPoints(qamValue);
+        if (chart) {
+          chart.destroy();
+        }
+        chart = new Chart(ctx, {
+          type: "scatter",
+          data: {
+            datasets: [
+              {
+                label: `${qamValue}-QAM Constellation`,
+                data: points,
+                pointBackgroundColor: "red",
+                pointRadius: 5,
+              },
+            ],
+          },
+          options: {
+            aspectRatio: 1,
+            scales: {
+              x: {
+                type: "linear",
+                position: "center",
+                min: -1.5,
+                max: 1.5,
+                title: {
+                  display: true,
+                  text: "Fase",
+                },
+              },
+              y: {
+                type: "linear",
+                position: "center",
+                min: -1.5,
+                max: 1.5,
+                title: {
+                  display: true,
+                  text: "Cuadratura",
+                },
+              },
+            },
+            plugins: {
+              legend: {
+                display: false,
+              },
+            },
+          },
+        });
+      }
+
+      qamSelect.addEventListener("change", (event) => {
+        const qamValue = parseInt(event.target.value);
+        updateChart(qamValue);
+      });
+
+      // Inicializar el gráfico con 4-QAM
+      updateChart(4);
+    </script>
+  </body>
+</html>
