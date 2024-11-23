@@ -151,17 +151,37 @@
 
       let chart;
 
-      function updateChart(qamValue) {
+      function updateChartWithNoise(qamValue, snr) {
         const points = generateQAMPoints(qamValue);
+        const evm = 1 / Math.sqrt(Math.pow(10, snr / 10));
+
+        const noisyPoints = points.flatMap((point) => {
+          return Array.from({ length: 16 }, () => {
+            const angle = Math.random() * 2 * Math.PI;
+            const distance = Math.random() * evm + Number.EPSILON;
+            return {
+              x: point.x + distance * Math.cos(angle),
+              y: point.y + distance * Math.sin(angle),
+            };
+          });
+        });
+
         if (chart) {
           chart.destroy();
         }
+
         chart = new Chart(ctx, {
           type: "scatter",
           data: {
             datasets: [
               {
-                label: `${qamValue}-QAM Constellation`,
+                label: "Símbolo Recibido",
+                data: noisyPoints,
+                pointBackgroundColor: "blue",
+                pointRadius: 2,
+              },
+              {
+                label: "Símbolo Ideal",
                 data: points,
                 pointBackgroundColor: "red",
                 pointRadius: 5,
@@ -194,7 +214,7 @@
             },
             plugins: {
               legend: {
-                display: false,
+                display: true,
               },
             },
           },
@@ -211,22 +231,31 @@
         const snr = parseFloat(snrRange.value);
         const qam = calculateQAM(snr);
         qamSelect.value = qam.toString();
-        updateChart(qam);
+        updateChartWithNoise(qam, snr);
       }
 
       qamSelect.addEventListener("change", (event) => {
         const qamValue = parseInt(event.target.value);
-        updateChart(qamValue);
+        const snr = parseFloat(snrRange.value);
+        updateChartWithNoise(qamValue, snr);
       });
 
       snrRange.addEventListener("input", (event) => {
-        snrValue.textContent = event.target.value + " dB";
+        const snr = parseFloat(event.target.value);
+        snrValue.textContent = snr.toFixed(3) + " dB";
+        const qamValue = parseInt(qamSelect.value);
+        updateChartWithNoise(qamValue, snr);
       });
 
-      adaptButton.addEventListener("click", adaptModulation);
+      adaptButton.addEventListener("click", () => {
+        adaptModulation();
+        const qamValue = parseInt(qamSelect.value);
+        const snr = parseFloat(snrRange.value);
+        updateChartWithNoise(qamValue, snr);
+      });
 
       // Inicializar el gráfico con 4-QAM
-      updateChart(4);
+      updateChartWithNoise(4, parseFloat(snrRange.value));
     </script>
   </body>
 </html>
