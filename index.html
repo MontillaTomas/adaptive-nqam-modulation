@@ -25,21 +25,54 @@
         class="w-full max-w-4xl bg-white shadow-md rounded-lg overflow-hidden"
       >
         <div class="p-4">
-          <div class="mb-4">
-            <label for="qam-select" class="block mb-2 font-bold"
-              >Selecciona la modulación QAM:</label
-            >
-            <select
-              id="qam-select"
-              class="w-full p-2 border border-gray-300 rounded"
-            >
-              <option value="4">4-QAM</option>
-              <option value="8">8-QAM</option>
-              <option value="16">16-QAM</option>
-              <option value="32">32-QAM</option>
-              <option value="64">64-QAM</option>
-              <option value="256">256-QAM</option>
-            </select>
+          <div
+            class="mb-4 flex flex-col sm:flex-row sm:items-start sm:space-x-4"
+          >
+            <div class="flex-grow mb-2 sm:mb-0">
+              <label for="snr-range" class="block mb-2 font-bold"
+                >SNR<sub>dB</sub>:</label
+              >
+              <input
+                type="range"
+                id="snr-range"
+                min="11.761"
+                max="48.165"
+                step="0.001"
+                value="11.761"
+                class="w-full"
+              />
+              <output
+                for="snr-range"
+                id="snr-value"
+                class="text-sm text-gray-600"
+                >11.761 dB</output
+              >
+            </div>
+            <div class="flex-grow mb-2 sm:mb-0">
+              <label for="qam-select" class="block mb-2 font-bold"
+                >Modulación QAM:</label
+              >
+              <select
+                id="qam-select"
+                class="w-full p-2 border border-gray-300 rounded"
+              >
+                <option value="4">4-QAM</option>
+                <option value="8">8-QAM</option>
+                <option value="16">16-QAM</option>
+                <option value="32">32-QAM</option>
+                <option value="64">64-QAM</option>
+                <option value="256">256-QAM</option>
+              </select>
+            </div>
+            <div class="flex-shrink-0">
+              <div class="hidden sm:block mb-2 font-bold">&nbsp;</div>
+              <button
+                id="adapt-button"
+                class="w-full sm:w-auto px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+              >
+                Adaptar modulación
+              </button>
+            </div>
           </div>
 
           <div class="bg-white p-4 rounded shadow">
@@ -65,6 +98,9 @@
     <script>
       const ctx = document.getElementById("qamChart").getContext("2d");
       const qamSelect = document.getElementById("qam-select");
+      const snrRange = document.getElementById("snr-range");
+      const snrValue = document.getElementById("snr-value");
+      const adaptButton = document.getElementById("adapt-button");
 
       function generateQAMPoints(qamValue) {
         const points = [];
@@ -165,10 +201,29 @@
         });
       }
 
+      function calculateQAM(snr) {
+        const M = Math.sqrt(Math.pow(10, snr / 10) + 1);
+        const qamOptions = [4, 8, 16, 32, 64, 256];
+        return qamOptions.reduce((prev, curr) => (curr <= M ? curr : prev));
+      }
+
+      function adaptModulation() {
+        const snr = parseFloat(snrRange.value);
+        const qam = calculateQAM(snr);
+        qamSelect.value = qam.toString();
+        updateChart(qam);
+      }
+
       qamSelect.addEventListener("change", (event) => {
         const qamValue = parseInt(event.target.value);
         updateChart(qamValue);
       });
+
+      snrRange.addEventListener("input", (event) => {
+        snrValue.textContent = event.target.value + " dB";
+      });
+
+      adaptButton.addEventListener("click", adaptModulation);
 
       // Inicializar el gráfico con 4-QAM
       updateChart(4);
