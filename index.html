@@ -105,14 +105,27 @@
       function generateQAMPoints(qamValue) {
         const points = [];
         if (qamValue === 8) {
-          // Generar puntos para 8-QAM (octágono)
-          const r = 0.75; // Radio del octágono
-          for (let i = 0; i < 8; i++) {
-            const angle = (i * Math.PI) / 4;
-            points.push({
-              x: r * Math.cos(angle),
-              y: r * Math.sin(angle),
-            });
+          // Generar puntos para 8-QAM (4x4 grid)
+          const side = Math.sqrt(qamValue + 8);
+          const step = 2 / side;
+          for (let i = 0; i < side; i++) {
+            for (let j = 0; j < side; j++) {
+              if (
+                (i == 0 && j == 0) ||
+                (i == 0 && j == 3) ||
+                (i == 3 && j == 0) ||
+                (i == 3 && j == 3) ||
+                (i == 1 && j == 1) ||
+                (i == 1 && j == 2) ||
+                (i == 2 && j == 1) ||
+                (i == 2 && j == 2)
+              ) {
+                points.push({
+                  x: -1 + step / 2 + i * step,
+                  y: -1 + step / 2 + j * step,
+                });
+              }
+            }
           }
         } else if (qamValue === 32) {
           // Generar puntos para 32-QAM (6x6 grid sin las esquinas)
