@@ -248,18 +248,27 @@
                 ctx.strokeStyle = "rgba(255, 0, 0, 0.5)";
                 ctx.lineWidth = 1;
 
+                const xStart = x.getPixelForValue(-1);
+                const xEnd = x.getPixelForValue(1);
+                const yStart = y.getPixelForValue(-1);
+                const yEnd = y.getPixelForValue(1);
+
                 for (let i = 0; i <= gridSize; i++) {
                   const xPos = x.getPixelForValue(-1 + i * step);
-                  ctx.beginPath();
-                  ctx.moveTo(xPos, top);
-                  ctx.lineTo(xPos, bottom);
-                  ctx.stroke();
+                  if (xPos >= xStart && xPos <= xEnd) {
+                    ctx.beginPath();
+                    ctx.moveTo(xPos, yStart);
+                    ctx.lineTo(xPos, yEnd);
+                    ctx.stroke();
+                  }
 
                   const yPos = y.getPixelForValue(-1 + i * step);
-                  ctx.beginPath();
-                  ctx.moveTo(left, yPos);
-                  ctx.lineTo(right, yPos);
-                  ctx.stroke();
+                  if (yPos >= yEnd && yPos <= yStart) {
+                    ctx.beginPath();
+                    ctx.moveTo(xStart, yPos);
+                    ctx.lineTo(xEnd, yPos);
+                    ctx.stroke();
+                  }
                 }
 
                 ctx.restore();
