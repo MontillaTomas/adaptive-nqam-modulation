@@ -10,7 +10,7 @@
   <body class="bg-gray-100 min-h-screen flex flex-col">
     <header class="bg-blue-600 text-white p-2 w-full">
       <div class="max-w-4xl mx-auto">
-        <a href="/"
+        <a href=""
           ><h1
             class="text-2xl font-bold text-center hover:bg-blue-400 p-2 rounded"
           >
@@ -65,13 +65,13 @@
               </select>
             </div>
             <div class="flex-shrink-0">
-              <div class="hidden sm:block mb-2 font-bold">&nbsp;</div>
-              <button
-                id="adapt-button"
-                class="w-full sm:w-auto px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
-              >
-                Adaptar modulación
-              </button>
+              <div class="block mb-2 font-bold">QAM Recomendado:</div>
+              <input
+                type="text"
+                id="recommended-qam"
+                class="w-full sm:w-auto px-4 py-2 border border-gray-300 rounded"
+                readonly
+              />
             </div>
           </div>
 
@@ -100,7 +100,7 @@
       const qamSelect = document.getElementById("qam-select");
       const snrRange = document.getElementById("snr-range");
       const snrValue = document.getElementById("snr-value");
-      const adaptButton = document.getElementById("adapt-button");
+      const recommendedQamInput = document.getElementById("recommended-qam");
 
       function generateQAMPoints(qamValue) {
         const points = [];
@@ -227,11 +227,10 @@
         return qamOptions.reduce((prev, curr) => (curr <= M ? curr : prev));
       }
 
-      function adaptModulation() {
-        const snr = parseFloat(snrRange.value);
+      function updateRecommendedQAM(snr) {
         const qam = calculateQAM(snr);
-        qamSelect.value = qam.toString();
-        updateChartWithNoise(qam, snr);
+        recommendedQamInput.value = qam + "-QAM";
+        return qam;
       }
 
       qamSelect.addEventListener("change", (event) => {
@@ -243,19 +242,14 @@
       snrRange.addEventListener("input", (event) => {
         const snr = parseFloat(event.target.value);
         snrValue.textContent = snr.toFixed(3) + " dB";
-        const qamValue = parseInt(qamSelect.value);
-        updateChartWithNoise(qamValue, snr);
-      });
-
-      adaptButton.addEventListener("click", () => {
-        adaptModulation();
-        const qamValue = parseInt(qamSelect.value);
-        const snr = parseFloat(snrRange.value);
-        updateChartWithNoise(qamValue, snr);
+        const qamValue = updateRecommendedQAM(snr);
+        updateChartWithNoise(parseInt(qamSelect.value), snr);
       });
 
       // Inicializar el gráfico con 4-QAM
-      updateChartWithNoise(4, parseFloat(snrRange.value));
+      const initialSNR = parseFloat(snrRange.value);
+      updateRecommendedQAM(initialSNR);
+      updateChartWithNoise(4, initialSNR);
     </script>
   </body>
 </html>
