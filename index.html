@@ -6,6 +6,7 @@
     <title>nQAM Adaptativo</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation"></script>
   </head>
   <body class="bg-gray-100 min-h-screen flex flex-col">
     <header class="bg-blue-600 text-white p-2 w-full">
@@ -187,6 +188,17 @@
           qamValue === 8 ? 4 : qamValue === 32 ? 6 : Math.sqrt(qamValue);
         const step = 2 / gridSize;
 
+        const boxAnnotations = points.map((point, index) => ({
+          type: "box",
+          xMin: point.x - step / 2,
+          xMax: point.x + step / 2,
+          yMin: point.y - step / 2,
+          yMax: point.y + step / 2,
+          backgroundColor: "transparent",
+          borderColor: "rgba(255, 0, 0, 0.5)",
+          borderWidth: 1,
+        }));
+
         chart = new Chart(ctx, {
           type: "scatter",
           data: {
@@ -233,48 +245,11 @@
               legend: {
                 display: true,
               },
-            },
-          },
-          plugins: [
-            {
-              id: "customGridLines",
-              beforeDraw: (chart) => {
-                const {
-                  ctx,
-                  chartArea: { left, top, right, bottom },
-                  scales: { x, y },
-                } = chart;
-                ctx.save();
-                ctx.strokeStyle = "rgba(255, 0, 0, 0.5)";
-                ctx.lineWidth = 1;
-
-                const xStart = x.getPixelForValue(-1);
-                const xEnd = x.getPixelForValue(1);
-                const yStart = y.getPixelForValue(-1);
-                const yEnd = y.getPixelForValue(1);
-
-                for (let i = 0; i <= gridSize; i++) {
-                  const xPos = x.getPixelForValue(-1 + i * step);
-                  if (xPos >= xStart && xPos <= xEnd) {
-                    ctx.beginPath();
-                    ctx.moveTo(xPos, yStart);
-                    ctx.lineTo(xPos, yEnd);
-                    ctx.stroke();
-                  }
-
-                  const yPos = y.getPixelForValue(-1 + i * step);
-                  if (yPos >= yEnd && yPos <= yStart) {
-                    ctx.beginPath();
-                    ctx.moveTo(xStart, yPos);
-                    ctx.lineTo(xEnd, yPos);
-                    ctx.stroke();
-                  }
-                }
-
-                ctx.restore();
+              annotation: {
+                annotations: boxAnnotations,
               },
             },
-          ],
+          },
         });
       }
 
