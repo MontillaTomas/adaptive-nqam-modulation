@@ -167,12 +167,15 @@
 
       function updateChartWithNoise(qamValue, snr) {
         const points = generateQAMPoints(qamValue);
-        const evm = 1 / Math.sqrt(Math.pow(10, snr / 10));
+        const currentSNR = Math.pow(10, snr / 10);
+        const optimalSNR = Math.pow(qamValue, 2) - 1;
+        const penalty = Math.max(1, Math.min(optimalSNR / currentSNR, 3));
+        const evm = 1 / Math.sqrt(currentSNR);
 
         const noisyPoints = points.flatMap((point) => {
           return Array.from({ length: 16 }, () => {
             const angle = Math.random() * 2 * Math.PI;
-            const distance = Math.random() * evm + Number.EPSILON;
+            const distance = (Math.random() * evm + Number.EPSILON) * penalty;
             return {
               x: point.x + distance * Math.cos(angle),
               y: point.y + distance * Math.sin(angle),
