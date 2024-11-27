@@ -48,8 +48,87 @@ function generateQAMPoints(qamValue) {
         }
       }
     }
+  } else if (qamValue === 512) {
+    // Generar puntos para 512-QAM (24x24 grid)
+    const side = Math.sqrt(qamValue + 64);
+    const step = 2 / side;
+    for (let i = 0; i < side; i++) {
+      for (let j = 0; j < side; j++) {
+        if (
+          !(i == 0 && j == 0) &&
+          !(i == 0 && j == 1) &&
+          !(i == 0 && j == 2) &&
+          !(i == 0 && j == 3) &&
+          !(i == 0 && j == 20) &&
+          !(i == 0 && j == 21) &&
+          !(i == 0 && j == 22) &&
+          !(i == 0 && j == 23) &&
+          !(i == 1 && j == 0) &&
+          !(i == 1 && j == 1) &&
+          !(i == 1 && j == 2) &&
+          !(i == 1 && j == 3) &&
+          !(i == 1 && j == 20) &&
+          !(i == 1 && j == 21) &&
+          !(i == 1 && j == 22) &&
+          !(i == 1 && j == 23) &&
+          !(i == 2 && j == 0) &&
+          !(i == 2 && j == 1) &&
+          !(i == 2 && j == 2) &&
+          !(i == 2 && j == 3) &&
+          !(i == 2 && j == 20) &&
+          !(i == 2 && j == 21) &&
+          !(i == 2 && j == 22) &&
+          !(i == 2 && j == 23) &&
+          !(i == 3 && j == 0) &&
+          !(i == 3 && j == 1) &&
+          !(i == 3 && j == 2) &&
+          !(i == 3 && j == 3) &&
+          !(i == 3 && j == 20) &&
+          !(i == 3 && j == 21) &&
+          !(i == 3 && j == 22) &&
+          !(i == 3 && j == 23) &&
+          !(i == 20 && j == 0) &&
+          !(i == 20 && j == 1) &&
+          !(i == 20 && j == 2) &&
+          !(i == 20 && j == 3) &&
+          !(i == 20 && j == 20) &&
+          !(i == 20 && j == 21) &&
+          !(i == 20 && j == 22) &&
+          !(i == 20 && j == 23) &&
+          !(i == 21 && j == 0) &&
+          !(i == 21 && j == 1) &&
+          !(i == 21 && j == 2) &&
+          !(i == 21 && j == 3) &&
+          !(i == 21 && j == 20) &&
+          !(i == 21 && j == 21) &&
+          !(i == 21 && j == 22) &&
+          !(i == 21 && j == 23) &&
+          !(i == 22 && j == 0) &&
+          !(i == 22 && j == 1) &&
+          !(i == 22 && j == 2) &&
+          !(i == 22 && j == 3) &&
+          !(i == 22 && j == 20) &&
+          !(i == 22 && j == 21) &&
+          !(i == 22 && j == 22) &&
+          !(i == 22 && j == 23) &&
+          !(i == 23 && j == 0) &&
+          !(i == 23 && j == 1) &&
+          !(i == 23 && j == 2) &&
+          !(i == 23 && j == 3) &&
+          !(i == 23 && j == 20) &&
+          !(i == 23 && j == 21) &&
+          !(i == 23 && j == 22) &&
+          !(i == 23 && j == 23)
+        ) {
+          points.push({
+            x: -1 + step / 2 + i * step,
+            y: -1 + step / 2 + j * step,
+          });
+        }
+      }
+    }
   } else {
-    // Generar puntos para 4, 16, 64 y 256-QAM
+    // Generar puntos para 4, 16, 64, 256 y 1024-QAM
     const side = Math.sqrt(qamValue);
     const step = 2 / side;
     for (let i = 0; i < side; i++) {
@@ -159,7 +238,7 @@ function updateChartWithNoise(qamValue, snr) {
 
 function calculateQAM(snr) {
   const M = Math.sqrt(Math.pow(10, snr / 10) + 1);
-  const qamOptions = [4, 8, 16, 32, 64, 256];
+  const qamOptions = [4, 8, 16, 32, 64, 256, 512, 1024];
   return qamOptions.reduce((prev, curr) => (curr <= M ? curr : prev));
 }
 

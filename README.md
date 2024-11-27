@@ -11,7 +11,7 @@ La modulación de amplitud en cuadratura (QAM, por sus siglas en inglés) es una
 1. Visualización interactiva de constelaciones QAM y simulación de los símbolos recibidos.
 2. Ajuste dinámico del rango de SNR.
 3. Recomendación automática del esquema QAM más eficiente basado en el SNR.
-4. Soporte para esquemas QAM comunes: 4-QAM, 8-QAM, 16-QAM, 32-QAM, 64-QAM, 256-QAM.
+4. Soporte para esquemas QAM comunes: 4-QAM, 8-QAM, 16-QAM, 32-QAM, 64-QAM, 256-QAM, 512-QAM, 1024-QAM.
 
 ## Cómo usar la aplicación
 
